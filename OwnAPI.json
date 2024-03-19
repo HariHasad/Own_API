@@ -1,0 +1,263 @@
+{
+	"info": {
+		"_postman_id": "5085f754-772b-4e1a-91aa-de43a410cf24",
+		"name": "OwnAPI",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "32468756"
+	},
+	"item": [
+		{
+			"name": "Get list of books",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Verify the status code is 200\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    });\r",
+							"\r",
+							"pm.test(\"Time limit should be below 50 milliseconds\", () => {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(50);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response body size should be below 800 bytes\", function () {\r",
+							"    pm.expect(pm.response.responseSize).to.be.below(800);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"local url\",\"http://localhost:3000/books\");"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{local url}}",
+					"host": [
+						"{{local url}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create new book",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Verify the status code is 201\", () => {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"//Store the id in environment variable\r",
+							"var JSONData= JSON.parse(responseBody);\r",
+							"pm.environment.set(\"Ponniyan book id\",JSONData.id);\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var random = Math.random().toString(36).substring(2);\r",
+							"\r",
+							"var bookTitle = \"Ponniyanselvan book \" + random;\r",
+							"pm.environment.set(\"generated_book_title\", bookTitle);\r",
+							"\r",
+							"var authorname = \"Kalki \" + random;\r",
+							"pm.environment.set(\"generated_author_name\", authorname);\r",
+							"\r",
+							"var genre = \"Drama \" + random;\r",
+							"pm.environment.set(\"generated_genre_type\", genre);\r",
+							"\r",
+							"\r",
+							"var minYear = 1500;\r",
+							"var maxYear = 1900;\r",
+							"var randomYear = Math.floor(Math.random() * (maxYear - minYear + 1)) + minYear;\r",
+							"pm.environment.set(\"generated_random_year\", randomYear);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n      \"title\": \"{{generated_book_title}}\",\r\n      \"author\": \"{{generated_author_name}}\",\r\n      \"genre\": \"{{generated_genre_type}}\",\r\n      \"year\": {{generated_random_year}}\r\n    }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{local url}}",
+					"host": [
+						"{{local url}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Single book",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"\r",
+							"// To validate the response with geerated environment vvariable\r",
+							"pm.test(\"Values in the JSON fields\", () => {\r",
+							"    var JSONResponse = pm.response.json();\r",
+							"    pm.expect(JSONResponse.id).to.eql(pm.environment.get(\"Ponniyan book id\"));\r",
+							"    pm.expect(JSONResponse.title).to.eql(pm.environment.get(\"generated_book_title\"));\r",
+							"    pm.expect(JSONResponse.author).to.eql(pm.environment.get(\"generated_author_name\"));\r",
+							"    pm.expect(JSONResponse.genre).to.eql(pm.environment.get(\"generated_genre_type\"));\r",
+							"    pm.expect(JSONResponse.year).to.eql(pm.environment.get(\"generated_random_year\"));\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response status is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{local url}}/{{Ponniyan book id}}",
+					"host": [
+						"{{local url}}"
+					],
+					"path": [
+						"{{Ponniyan book id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update the newly created book",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Verify the status code is 200\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Values in the JSON fields\", () => {\r",
+							"    var JSONResponse = pm.response.json();\r",
+							"    pm.expect(JSONResponse.id).to.eql(pm.environment.get(\"Ponniyan book id\"));\r",
+							"    pm.expect(JSONResponse.title).to.eql(\"Ponniyan selvan\");\r",
+							"    pm.expect(JSONResponse.author).to.eql(\"Kalki\");\r",
+							"    pm.expect(JSONResponse.genre).to.eql(\"NOn-fictional\");\r",
+							"    pm.expect(JSONResponse.year).to.eql(1800);\r",
+							"    \r",
+							"    \r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n     \"title\": \"Ponniyan selvan\",\r\n      \"author\": \"Kalki\",\r\n      \"genre\": \"NOn-fictional\",\r\n      \"year\": 1800\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{local url}}/{{Ponniyan book id}}",
+					"host": [
+						"{{local url}}"
+					],
+					"path": [
+						"{{Ponniyan book id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete a newly created book",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Verify the status code is 200\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.environment.unset(\"generated_author_name\");\r",
+							"pm.environment.unset(\"generated_book_title\");\r",
+							"pm.environment.unset(\"generated_genre_type\");\r",
+							"pm.environment.unset(\"Ponniyan book id\");\r",
+							"pm.environment.unset(\"generated_random_year\");"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{local url}}/{{Ponniyan book id}}",
+					"host": [
+						"{{local url}}"
+					],
+					"path": [
+						"{{Ponniyan book id}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
